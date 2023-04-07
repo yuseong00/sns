@@ -8,6 +8,8 @@ import com.example.sns.model.entity.UserEntity;
 import com.example.sns.repository.PostEntityRepository;
 import com.example.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,14 @@ public class PostService {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
         }
         postEntityRepository.delete(postEntity);
+    }
+
+    public Page<Post> list(Pageable pageable) {
+        return postEntityRepository.findAll(pageable).map(Post::fromEntity);
+    }
+
+    public Page<Post> my(Integer userId, Pageable pageable) {
+        return postEntityRepository.findAllByUserId(userId, pageable).map(Post::fromEntity);
     }
 
 
