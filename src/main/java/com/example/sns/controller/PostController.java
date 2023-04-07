@@ -1,16 +1,21 @@
 package com.example.sns.controller;
 
 import com.example.sns.controller.response.Response;
+import com.example.sns.model.Post;
+import com.example.sns.model.User;
 import com.example.sns.service.PostService;
+import com.example.sns.util.ClassUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
+
+import static com.example.sns.controller.UserController.*;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -27,12 +32,52 @@ public class PostController {
         postService.create(authentication.getName(), request.getTitle(), request.getBody());
         return Response.success();
     }
+
+    @PutMapping("/{postId}")
+    public Response<PostResponse> modify(@PathVariable Integer postId, @RequestBody PostModifyRequest request, Authentication authentication) {
+        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+        return Response.success(PostResponse.fromPost(
+                        postService.modify(user.getId(), postId, request.getTitle(), request.getBody())));
+    }
+
+
+
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class PostWriteRequest {
         private String title;
         private String body;
     }
 
+
+    @Data
+    @AllArgsConstructor
+    public static class PostModifyRequest {
+        private String title;
+        private String body;
+    }
+
+
+    @Getter
+    @AllArgsConstructor
+    public static class PostResponse {
+        private Integer id;
+        private String title;
+        private String body;
+        private UserResponse user;
+        private Timestamp registeredAt;
+        private Timestamp updatedAt;
+
+        public static PostResponse fromPost(Post post) {
+            return new PostResponse(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getBody(),
+                    UserResponse.fromUser(post.getUser()),
+                    post.getRegisteredAt(),
+                    post.getUpdatedAt()
+            );
+        }
+
+    }
 }
