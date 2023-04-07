@@ -9,6 +9,7 @@ import com.example.sns.repository.UserRepository;
 import com.example.sns.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,9 @@ public class UserService {
     }
 
 
-
-
+    public User loadUserByUsername(String userName) throws UsernameNotFoundException {
+        return userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
+                        () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
+                );
+    }
 }

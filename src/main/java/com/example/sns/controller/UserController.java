@@ -2,6 +2,7 @@ package com.example.sns.controller;
 
 import com.example.sns.controller.response.Response;
 import com.example.sns.model.User;
+import com.example.sns.model.UserRole;
 import com.example.sns.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,11 +55,14 @@ public class UserController {
     public static class UserResponse {
         private Integer id;
         private String userName;
+        private UserRole role;
 
-        public  UserResponse fromUser(User user) {
+        public static UserResponse fromUser(User user) {
             return new UserResponse(
                     user.getId(),
-                    user.getUsername());
+                    user.getUsername(),
+                    user.getRole()
+        );
         }
     }
 
