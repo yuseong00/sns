@@ -2,6 +2,7 @@ package com.example.sns.controller;
 
 import com.example.sns.controller.response.Response;
 import com.example.sns.model.User;
+import com.example.sns.model.UserRole;
 import com.example.sns.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,15 +24,25 @@ public class UserController {
 
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
-        return Response.success(UserJoinResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
+        return Response.success(UserJoinResponse.fromUser(userService.join(request.getName(), request.getPassword())));
     }
 
 
 
-    @PostMapping("/join")
-    public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
-        return Response.success(UserJoinResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
+    @PostMapping("/login")
+    public Response<UserLoginResponse> login (@RequestBody UserLoginRequest request) {
+        String token = userService.login(request.getName(), request.getPassword());
+        return Response.success(new UserLoginResponse(token));
+
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -44,17 +55,19 @@ public class UserController {
     public static class UserResponse {
         private Integer id;
         private String userName;
+        private UserRole role;
 
-        public  UserResponse fromUser(User user) {
+        public static UserResponse fromUser(User user) {
             return new UserResponse(
                     user.getId(),
-                    user.getUsername());
+                    user.getUsername(),
+                    user.getRole()
+        );
         }
     }
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserJoinResponse {
         private Integer id;
         private String userName;
@@ -78,17 +91,15 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserJoinRequest {
-        private String userName;
+        private String name;
         private String password;
-
     }
+
 
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserLoginRequest {
         private String name;
         private String password;
