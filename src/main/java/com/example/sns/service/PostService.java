@@ -22,15 +22,16 @@ public class PostService {
 
     @Transactional
     public void create(String userName, String title, String body) {
-        UserEntity userEntity = userEntityRepository.findByUserName(userName)
-                .orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
+        UserEntity userEntity = getUserEntityOrException(userName);
         PostEntity postEntity = PostEntity.of(title, body, userEntity);
         postEntityRepository.save(postEntity);
     }
 
+
+
     @Transactional
     public Post modify(Integer userId, Integer postId, String title, String body) {
-        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+        PostEntity postEntity = getPostEntityorException(postId);
         if (!Objects.equals(postEntity.getUser().getId(), userId)) {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
         }
@@ -43,10 +44,25 @@ public class PostService {
 
 
 
+ 
+    @Transactional
+    public void delete(Integer userId, Integer postId) {
+        PostEntity postEntity = getPostEntityorException(postId);
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
+        }
+        postEntityRepository.delete(postEntity);
+    }
 
 
 
 
-
-
+    private UserEntity getUserEntityOrException(String userName) {
+        UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
+        return userEntity;
+    }
+    private PostEntity getPostEntityorException(Integer postId) {
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+        return postEntity;
+    }
 }
