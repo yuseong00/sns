@@ -6,7 +6,9 @@ import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.repository.UserRepository;
 
+import com.example.sns.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
 
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.token.expired-time-ms}")
+    private Long expiredTimeMs;
 
 
     @Transactional
@@ -38,11 +45,10 @@ public class UserService {
         UserEntity userEntity=userRepository.findByUserName(userName).orElseThrow(()->
          new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded",userName))
         );
-        if(!encoder.matches(password,userEntity.getPassword())) {
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD, String.format("password is %s", password));
+        if (!encoder.matches(password, userEntity.getPassword())) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }
-
-        return "";
+        return JwtTokenUtils.generateAccessToken(userName, secretKey, expiredTimeMs);
     }
 
 
