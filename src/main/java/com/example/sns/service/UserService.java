@@ -36,11 +36,11 @@ public class UserService {
 
     public String login(String userName, String password) {
         UserEntity userEntity=userRepository.findByUserName(userName).orElseThrow(()->
-         new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("userName is %s",userName))
+         new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded",userName))
         );
-        if(!userEntity.getPassword().equals(password))
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD,String.format("password is %s",password));
-
+        if(!encoder.matches(password,userEntity.getPassword())) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD, String.format("password is %s", password));
+        }
 
         return "";
     }
