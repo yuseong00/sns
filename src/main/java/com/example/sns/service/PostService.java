@@ -30,29 +30,20 @@ public class PostService {
     }
 
 
-
     @Transactional
     public Post modify(Integer userId, Integer postId, String title, String body) {
         PostEntity postEntity = getPostEntityorException(postId);
-        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
-        }
-
+        isSameId(userId, postId, postEntity);
         postEntity.setTitle(title);
         postEntity.setBody(body);
-
         return Post.fromEntity(postEntityRepository.saveAndFlush(postEntity));
     }
 
 
-
- 
     @Transactional
     public void delete(Integer userId, Integer postId) {
         PostEntity postEntity = getPostEntityorException(postId);
-        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
-        }
+        isSameId(userId, postId, postEntity);
         postEntityRepository.delete(postEntity);
     }
 
@@ -67,6 +58,9 @@ public class PostService {
 
 
 
+
+
+
     private UserEntity getUserEntityOrException(String userName) {
         UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
         return userEntity;
@@ -74,5 +68,10 @@ public class PostService {
     private PostEntity getPostEntityorException(Integer postId) {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
         return postEntity;
+    }
+    private static void isSameId(Integer userId, Integer postId, PostEntity postEntity) {
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
+        }
     }
 }
