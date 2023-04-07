@@ -1,6 +1,8 @@
 package com.example.sns.controller;
 
 
+import com.example.sns.controller.UserController.UserJoinRequest;
+import com.example.sns.controller.UserController.UserLoginRequest;
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.model.User;
@@ -48,11 +50,10 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/api/v1/users/join")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new UserController.UserJoinRequest("name", "password"))))
+                        .content(objectMapper.writeValueAsBytes(new UserJoinRequest("name", "password"))))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
-
     @Test
     @WithAnonymousUser
     public void 회원가입시_같은_아이디로_회원가입하면_에러발생() throws Exception {
@@ -62,7 +63,7 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/api/v1/users/join")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new UserController.UserJoinRequest("name", "password"))))
+                        .content(objectMapper.writeValueAsBytes(new UserJoinRequest("name", "password"))))
                 .andDo(print())
                 .andExpect(status().is(ErrorCode.DUPLICATED_USER_NAME.getStatus().value()));
     }
@@ -77,7 +78,7 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new UserController.UserLoginRequest("name", "password"))))
+                        .content(objectMapper.writeValueAsBytes(new UserLoginRequest("name", "password"))))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -92,7 +93,7 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new UserController.UserLoginRequest("name", "password"))))
+                        .content(objectMapper.writeValueAsBytes(new UserLoginRequest("name", "password"))))
                 .andDo(print())
                 .andExpect(status().is(ErrorCode.USER_NOT_FOUND.getStatus().value()));
     }
@@ -107,7 +108,7 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new UserController.UserLoginRequest("name", "password"))))
+                        .content(objectMapper.writeValueAsBytes(new UserLoginRequest("name", "password"))))
                 .andDo(print())
                 .andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus().value()));
     }

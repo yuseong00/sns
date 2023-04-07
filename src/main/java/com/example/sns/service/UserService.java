@@ -4,7 +4,7 @@ import com.example.sns.model.User;
 import com.example.sns.model.entity.UserEntity;
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
-import com.example.sns.repository.UserRepository;
+import com.example.sns.repository.UserEntityRepository;
 
 import com.example.sns.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
 
-    private final UserRepository userRepository;
+    private final UserEntityRepository userRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -33,20 +33,20 @@ public class UserService {
 
     @Transactional
     public User join(String userName, String password) {
+        // check the userId not exist
         userRepository.findByUserName(userName).ifPresent(it -> {
             throw new SimpleSnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("userName is %s", userName));
-        });//
-        UserEntity userEntity = userRepository.save(UserEntity.of(userName, encoder.encode(password)));
-        return User.fromEntity(userEntity);
+        });
+
+        UserEntity savedUser = userRepository.save(UserEntity.of(userName, encoder.encode(password)));
+        return User.fromEntity(savedUser);
     }
 
 
-
     public String login(String userName, String password) {
-        UserEntity userEntity=userRepository.findByUserName(userName).orElseThrow(()->
-         new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded",userName))
-        );
-        if (!encoder.matches(password, userEntity.getPassword())) {
+        User savedUser = loadUserByUsername(userName);
+
+        if (!encoder.matches(password, savedUser.getPassword())) {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }
         return JwtTokenUtils.generateAccessToken(userName, secretKey, expiredTimeMs);

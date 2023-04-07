@@ -1,10 +1,9 @@
 package com.example.sns.service;
 
-import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.fixture.UserEntityFixture;
 import com.example.sns.model.entity.UserEntity;
-import com.example.sns.repository.UserRepository;
+import com.example.sns.repository.UserEntityRepository;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +25,7 @@ public class UserServiceTest {
     UserService userService;
 
     @MockBean
-    UserRepository userEntityRepository;
+    UserEntityRepository userEntityRepository;
 
     @MockBean
     BCryptPasswordEncoder bCryptPasswordEncoder;

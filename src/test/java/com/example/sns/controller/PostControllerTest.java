@@ -1,5 +1,6 @@
 package com.example.sns.controller;
 
+import com.example.sns.controller.PostController.PostModifyRequest;
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.service.PostService;
@@ -91,39 +92,40 @@ public class PostControllerTest {
                 .andExpect(status().isOk());
     }
 
+
     @Test
     @WithMockUser
-    void 포스트수정시_본인이작성한글이아닌경우() throws Exception {
-        String title = "name";
-        String body = "body";
-
-        doThrow(new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, "본인이 작성한 글이 아닙니다."))
-                .when(postService).modify(eq(title),eq(body), any(), 1);
-
+    void 포스트수정시_본인이_작성한_글이_아니라면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostController.PostWriteRequest(title, body))))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().is(ErrorCode.INVALID_PERMISSION.getStatus().value()));
     }
 
 
     @Test
     @WithMockUser
-    void 포스트수정시_수정하려는글이_없는경우() throws Exception {
-        String title = "name";
-        String body = "body";
-
-        doThrow(new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, "본인이 작성한 글이 없습니다."))
-                .when(postService).modify(eq(title),eq(body), any(), 1);
-
+    void 포스트수정시_수정하려는글이_없다면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(new PostController.PostWriteRequest(title, body))))
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()));
     }
 
+    @Test
+    @WithMockUser
+    void 포스트수정시_데이터베이스_에러_발생시_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.DATABASE_ERROR)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
+        mockMvc.perform(put("/api/v1/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
+                .andDo(print())
+                .andExpect(status().is(ErrorCode.DATABASE_ERROR.getStatus().value()));
+    }
 
 
 }

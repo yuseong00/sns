@@ -24,14 +24,14 @@ public class UserController {
 
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
-        return Response.success(UserJoinResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
+        return Response.success(UserJoinResponse.fromUser(userService.join(request.getName(), request.getPassword())));
     }
 
 
 
     @PostMapping("/login")
     public Response<UserLoginResponse> login (@RequestBody UserLoginRequest request) {
-        String token = userService.login(request.getUserName(), request.getPassword());
+        String token = userService.login(request.getName(), request.getPassword());
         return Response.success(new UserLoginResponse(token));
 
     }
@@ -68,7 +68,6 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserJoinResponse {
         private Integer id;
         private String userName;
@@ -92,19 +91,17 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserJoinRequest {
-        private String userName;
+        private String name;
         private String password;
-
     }
+
 
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class UserLoginRequest {
-        private String userName;
+        private String name;
         private String password;
     }
 
