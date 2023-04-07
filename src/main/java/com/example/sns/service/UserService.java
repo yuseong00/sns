@@ -7,6 +7,7 @@ import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class UserService {
 
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
 
 
@@ -26,7 +28,7 @@ public class UserService {
         userRepository.findByUserName(userName).ifPresent(it -> {
             throw new SimpleSnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("userName is %s", userName));
         });//
-        UserEntity userEntity = userRepository.save(UserEntity.of(userName, password));
+        UserEntity userEntity = userRepository.save(UserEntity.of(userName, encoder.encode(password)));
         return User.fromEntity(userEntity);
     }
 

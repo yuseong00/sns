@@ -5,6 +5,7 @@ import com.example.sns.model.User;
 import com.example.sns.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +22,16 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/join")
-    public Response<UserResponse> join(@RequestBody UserJoinRequest request) {
-        return Response.success(UserResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
+    public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
+        return Response.success(UserJoinResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
     }
 
 
 
+    @PostMapping("/join")
+    public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
+        return Response.success(UserJoinResponse.fromUser(userService.join(request.getUserName(), request.getPassword())));
+    }
 
 
 
@@ -36,12 +41,11 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    public static
-    class UserResponse {
+    public static class UserResponse {
         private Integer id;
         private String userName;
 
-        public static UserResponse fromUser(User user) {
+        public  UserResponse fromUser(User user) {
             return new UserResponse(
                     user.getId(),
                     user.getUsername());
@@ -50,10 +54,10 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    public static
-    class UserJoinResponse {
+    @NoArgsConstructor
+    public static class UserJoinResponse {
         private Integer id;
-        private String name;
+        private String userName;
 
         public static UserJoinResponse fromUser(User user) {
             return new UserJoinResponse(
@@ -64,7 +68,8 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    public class UserLoginResponse {
+    @NoArgsConstructor
+    public static class UserLoginResponse {
         private String token;
     }
 
@@ -73,15 +78,18 @@ public class UserController {
 
     @Getter
     @AllArgsConstructor
-    public class UserJoinRequest {
+    @NoArgsConstructor
+    public static class UserJoinRequest {
         private String userName;
         private String password;
+
     }
 
 
     @Getter
     @AllArgsConstructor
-    public class UserLoginRequest {
+    @NoArgsConstructor
+    public static class UserLoginRequest {
         private String name;
         private String password;
     }
