@@ -1,6 +1,7 @@
 package com.example.sns.controller;
 
 import com.example.sns.controller.response.Response;
+import com.example.sns.model.Comment;
 import com.example.sns.model.Post;
 import com.example.sns.model.User;
 import com.example.sns.service.PostService;
@@ -74,10 +75,24 @@ public class PostController {
     }
 
 
+    @PostMapping("/{postId}/comments")
+    public Response<Void> comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+        postService.comment(postId, authentication.getName(), request.getComment());
+        return Response.success();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public Response<Page<CommentResponse>> getComments(Pageable pageable, @PathVariable Integer postId) {
+        return Response.success(postService.getComments(postId, pageable).map(CommentResponse::fromComment));
+    }
+
+
+
 
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class PostWriteRequest {
         private String title;
         private String body;
@@ -86,10 +101,19 @@ public class PostController {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class PostModifyRequest {
         private String title;
         private String body;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PostCommentRequest {
+        private String comment;
+    }
+
 
 
     @Getter
@@ -114,4 +138,31 @@ public class PostController {
         }
 
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CommentResponse {
+        private Integer id;
+        private String comment;
+        private Integer userId;
+        private String userName;
+        private Integer postId;
+        private Timestamp registeredAt;
+        private Timestamp updatedAt;
+        private Timestamp removedAt;
+
+        public static CommentResponse fromComment(Comment comment) {
+            return new CommentResponse(
+                    comment.getId(),
+                    comment.getComment(),
+                    comment.getUserId(),
+                    comment.getUserName(),
+                    comment.getPostId(),
+                    comment.getRegisteredAt(),
+                    comment.getUpdatedAt(),
+                    comment.getRemovedAt()
+            );
+        }
+    }
+
 }
