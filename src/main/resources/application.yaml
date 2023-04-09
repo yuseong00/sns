@@ -20,3 +20,27 @@ jwt:
   token.expired-time-ms: 2592000000
 
 spring.redis.url: redis://:pac65b305e8e33ffe9c65b642287b78438333bcaa9cde064ead20cca5250a23cc@ec2-34-195-230-179.compute-1.amazonaws.com:30459
+
+
+spring:
+  kafka:
+    properties:
+      security.protocol: SASL_SSL            #클라우드카라프카를 쓰게되면 설정
+      sasl.mechanism: SCRAM-SHA-256          #클라우드카라프카를 쓰게되면 설정
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="uqivfdox" password="sUGzC5ltZMpfry6PMMIQgGgofmWEam6E";
+    consumer:
+      properties.spring.json.trusted.packages: "*"
+      bootstrap-servers: 192.168.0.4:9094
+      group-id: notification
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    listener:
+      ack-mode: MANUAL
+    producer:
+      bootstrap-servers: 192.168.0.4:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.enable.idempotence: false   #클라우드카라프카를 쓰게되면 설정
+    topic:
+      notification: uqivfdox-notification
