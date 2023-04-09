@@ -50,11 +50,15 @@ public class UserService {
 
 
     public String login(String userName, String password) {
+        long startTime = System.currentTimeMillis();
+
         User savedUser = loadUserByUsername(userName);
 
         if (!encoder.matches(password, savedUser.getPassword())) {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }
+        long totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("login method execution time: " + totalTime + "ms");
         return JwtTokenUtils.generateAccessToken(userName, secretKey, expiredTimeMs);
     }
 
@@ -64,6 +68,7 @@ public class UserService {
                         () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
                 );
     }
+
 
     @Transactional
     public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
