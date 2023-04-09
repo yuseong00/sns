@@ -25,6 +25,8 @@ public class PostService {
     private final CommentEntityRepository commentEntityRepository;
 
     private final AlarmEntityRepository alarmEntityRepository;
+    private final AlarmService alarmService;
+
 
 
     @Transactional
@@ -79,7 +81,10 @@ public class PostService {
 
         likeEntityRepository.save(LikeEntity.of(postEntity, userEntity));
 
-        alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_LIKE_ON_POST,new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
+        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
+
+        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
+
 
     }
 
@@ -95,8 +100,9 @@ public class PostService {
         UserEntity userEntity = getUserEntityOrException(userName);
 
         commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
-        alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST,new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
+        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
 
+        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
     }
 
 
