@@ -33,15 +33,18 @@ public class AlarmService {
 
 
 
-    public void send(Integer alarmId, Integer userId) {
-        emitterRepository.get(userId).ifPresentOrElse(SseEmitter -> {
+    public void send(AlarmType type, AlarmArgs args, Integer receiverId) {
+        UserEntity userEntity = userEntityRepository.findById(receiverId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND));
+        AlarmEntity entity = AlarmEntity.of(type, args, userEntity);
+        alarmEntityRepository.save(entity);
+        emitterRepository.get(receiverId).ifPresentOrElse(it -> {
                     try {
-                        SseEmitter.send(SseEmitter.event()
-                                .id(alarmId.toString())
+                        it.send(SseEmitter.event()
+                                .id(entity.getId().toString())
                                 .name(ALARM_NAME)
                                 .data(new AlarmNotification()));
                     } catch (IOException exception) {
-                        emitterRepository.delete(userId);
+                        emitterRepository.delete(receiverId);
                         throw new SimpleSnsApplicationException(ErrorCode.NOTIFICATION_CONNECT_ERROR);
                     }
                 },
