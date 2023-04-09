@@ -18,3 +18,5 @@ jwt:
   secret-key: com.example.sns_2023_secret_key_com.example.sns_2023_secret_key
   # 30 days
   token.expired-time-ms: 2592000000
+
+spring.redis.url: redis://:pac65b305e8e33ffe9c65b642287b78438333bcaa9cde064ead20cca5250a23cc@ec2-34-195-230-179.compute-1.amazonaws.com:30459

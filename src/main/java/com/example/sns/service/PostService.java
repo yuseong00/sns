@@ -29,8 +29,12 @@ public class PostService {
 
     @Transactional
     public void create(String userName, String title, String body) {
+        long startTime = System.currentTimeMillis();
         UserEntity userEntity = getUserEntityOrException(userName);
         PostEntity postEntity = PostEntity.of(title, body, userEntity);
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("create method execution time: " + totalTime + "ms");
         postEntityRepository.save(postEntity);
     }
 
@@ -76,7 +80,6 @@ public class PostService {
         likeEntityRepository.save(LikeEntity.of(postEntity, userEntity));
 
         alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_LIKE_ON_POST,new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
-
 
     }
 

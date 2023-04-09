@@ -6,6 +6,7 @@ import com.example.sns.model.entity.UserEntity;
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.repository.AlarmEntityRepository;
+import com.example.sns.repository.UserCacheRepository;
 import com.example.sns.repository.UserEntityRepository;
 
 import com.example.sns.util.JwtTokenUtils;
@@ -28,6 +29,7 @@ public class UserService {
     private final UserEntityRepository userRepository;
     private final AlarmEntityRepository alarmEntityRepository;
 
+    private final UserCacheRepository userCacheRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -53,6 +55,7 @@ public class UserService {
         long startTime = System.currentTimeMillis();
 
         User savedUser = loadUserByUsername(userName);
+        userCacheRepository.setUser(savedUser);
 
         if (!encoder.matches(password, savedUser.getPassword())) {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
@@ -60,13 +63,16 @@ public class UserService {
         long totalTime = System.currentTimeMillis() - startTime;
         System.out.println("login method execution time: " + totalTime + "ms");
         return JwtTokenUtils.generateAccessToken(userName, secretKey, expiredTimeMs);
+
     }
 
 
     public User loadUserByUsername(String userName) throws UsernameNotFoundException {
-        return userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
+       return userCacheRepository.getUser(userName).orElseGet(()->
+           userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
                         () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
-                );
+                ));
+
     }
 
 
