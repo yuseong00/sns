@@ -4,6 +4,8 @@ import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SimpleSnsApplicationException;
 import com.example.sns.model.*;
 import com.example.sns.model.entity.*;
+import com.example.sns.producer.AlarmProducer;
+import com.example.sns.producer.AlarmProducer.AlarmEvent;
 import com.example.sns.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,8 @@ public class PostService {
 
     private final AlarmEntityRepository alarmEntityRepository;
     private final AlarmService alarmService;
+    private final AlarmProducer alarmProducer;
+
 
 
 
@@ -81,9 +85,10 @@ public class PostService {
 
         likeEntityRepository.save(LikeEntity.of(postEntity, userEntity));
 
-        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
-
-        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
+//        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
+//
+//        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
+        alarmProducer.send(new AlarmEvent(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser().getId()));
 
 
     }
@@ -102,7 +107,9 @@ public class PostService {
         commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
         AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()), postEntity.getUser()));
 
-        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
+//        alarmService.send(alarmEntity.getId(),postEntity.getUser().getId());
+        alarmProducer.send(new AlarmEvent(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser().getId()));
+
     }
 
 
