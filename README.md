@@ -9,7 +9,7 @@ sns 게시판서비스
 
 
 ## 기술적 issue 해결과정 
-[#1]대규모 트래픽일시 현 arshitecture의 문제점 분석 및 해결
+[#1]대규모 트래픽일시 현 architecture 문제점 분석 및 해결
 
 https://hohojavis.tistory.com/56
 
