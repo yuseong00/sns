@@ -35,8 +35,6 @@ https://hohojavis.tistory.com/61
 
 &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: 실시간 업데이트를 위해 Kafka를 통한 비동기 처리를 사용하여 페이지 새로 고침 메커니즘을 개선하였습니다.
 
-&nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: nGrinder를 활용하여 성능테스트를 진행하고 성능 개선에 참고했습니다. 
-
 &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: Redis를 활용하여 낮은 지연시간과 빠른 데이터 엑세스와 처리를 높히기 위해 노력했습니다.  
 
 &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: CI/CD를 적용하고 자동화된 빌드와 배포를 통해 개발의 생산성을 높히기 위해 노력했습니다. 
